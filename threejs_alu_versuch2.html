@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+
+<!--
+/** Der Inhalt dieser Datei ist ausschließlich für die interne 
+* Verwendung im Wintersemester 2022/2023 durch Angehörige des 
+* Moodle-Kurs "Computergrafik (FHBSWF WINF 16 W22)" bestimmt.
+* 
+* Diese Datei darf Dritten, außerhalb des genannten Kurses in 
+* keinerlei Form übergeben und in keiner Weise zugänglich gemacht
+* werden.
+*
+* Datum: 17.12.2022
+* Autor: Dipl.-Inform. A. Ludwig.
+* (c) 2021-2022: Hochschule Braunschweig/Wolfenbüttel, Fakultät informatik.
+* Alle Rechte bleiben vorbehalten.
+*/
+-->
+
+  <head>
+  <!-- (c) 2020 Hochschule Braunschweig/Wolfenbuettel,
+       Fakultät Informatik, A. Ludwig.  -->
+    <title>My second three.js app</title>
+    <style>
+      body { margin: 0; }
+      canvas { width: 80%; height: 60% }
+    </style>
+  </head>
+  <body>
+    <script src="js/three.js"></script>
+    <script>
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      document.body.appendChild( renderer.domElement );
+
+
+
+      var camerap = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+      camerap.position.z = 5;
+
+      var camerao = new THREE.OrthographicCamera( -1/256 * window.innerWidth,   1/256 * window.innerWidth, 
+	                                               1/256 * window.innerHeight, -1/256 * window.innerHeight,
+                                                  -0.1, /* 0.1, */ 1000);//1000 );
+      camerao.position.z = 5;
+
+
+      // create scene
+      var scene = new THREE.Scene();
+
+
+	  // introduce temporary containers
+	  var geometry;
+	  var material;
+	  var mesh;
+	  var pointLight;
+
+
+
+      // Objekt Models of World
+
+
+      // stage
+	  var         stage = new THREE.Group();
+	  
+	  // stage Limiters
+      var stageLimiters = new THREE.Group();
+
+      // basement
+      geometry = new THREE.PlaneGeometry( 8, 6 );
+      material = new THREE.MeshPhongMaterial( {color: 0xccb776, side: THREE.BackSide} );
+      mesh = new THREE.Mesh( geometry, material );
+      mesh.rotation.x = 1.552;
+//      mesh.position.x = basement.position.x;
+      mesh.position.y = -1.5;
+      mesh.position.z = 1.5;
+	  stageLimiters.add(mesh);
+
+      // back wall
+      geometry = new THREE.PlaneGeometry( 12, 5 );
+      material = new THREE.MeshPhongMaterial( {color: 0xe5fcfa, side: THREE.FrontSide} );
+      mesh     = new THREE.Mesh( geometry, material );
+      mesh.position.y = 1.0;
+      mesh.position.z = -1;
+	  stageLimiters.add(mesh);
+
+
+      // set up some lights
+      var stageLightning = new THREE.Group();
+
+      // tiny sun globe left
+      geometry = new THREE.SphereGeometry( 0.07, 8, 8 );
+      material = new THREE.MeshLambertMaterial( {color: 0x990000, side: THREE.FrontSide} );
+      mesh = new THREE.Mesh( geometry, material );
+      mesh.position.set( -1.5, 0.8, 3 );
+	  stageLightning.add(mesh);
+      
+	  // its internal shining
+      pointLight = new THREE.PointLight( 0x990000, 1.2, 100, 2 );
+      pointLight.position.set( -1.5, 0.8, 2 );
+	  stageLightning.add(pointLight);
+
+      
+	  // tiny sun globe right
+      geometry = new THREE.SphereGeometry( 0.07, 8, 8 );
+      material = new THREE.MeshLambertMaterial( {color: 0xffffdf, side: THREE.FrontSide} );
+      mesh = new THREE.Mesh( geometry, material );
+      mesh.position.set( 2, 1.5, 2 );
+	  stageLightning.add(mesh);
+      
+	  // its internal shining
+      pointLight = new THREE.PointLight( 0xffffdf, 1.0, 100, 2 );
+      pointLight.position.set( 2, 1.5, 2 );
+	  stageLightning.add(pointLight);
+
+      stage.add(stageLimiters);
+	  stage.add(stageLightning);
+
+
+
+	  // Actors: 3d model coordinate system
+      var cubesSpace = new THREE.Group();
+	  
+	  // green cube
+      geometry = new THREE.BoxGeometry( 1, 1, 1 );
+      material = new THREE.MeshLambertMaterial( { color: 0x00aa00 } );
+	  material.needsUpdate = true;
+      var cube = new THREE.Mesh( geometry, material );
+      cubesSpace.add(cube);
+
+      // blue cube
+      geometry = new THREE.BoxGeometry( 0.8, 0.8, 0,8 );
+      material = new THREE.MeshPhongMaterial( { color: 0x0000ff, emissive: 0x000030, shininess: 50, specular: 0x2020ff } );
+	  material.needsUpdate = true;
+      mesh     = new THREE.Mesh( geometry, material );
+      alert(mesh.matrix.elements);
+      mesh.position.set(1,0,0);
+      alert(mesh.matrix.elements);
+	  mesh.updateMatrix();
+      alert(mesh.matrix.elements);
+      cubesSpace.add(mesh);
+      alert(mesh.matrix.elements);
+
+
+      // add stage and actors to the world (scene)
+      stage.add(cubesSpace);
+      scene.add(stage);
+	  
+
+      var animateo = function () {
+        requestAnimationFrame( animateo );
+
+        cubesSpace.rotation.x += 0.01;
+        cubesSpace.rotation.y += 0.01;
+//        object2.updateMatrix();
+
+        renderer.render( scene, camerao );
+      };
+
+
+
+      var animatep = function () {
+        requestAnimationFrame( animatep );
+
+        cubesSpace.rotation.x += 0.01;
+        cubesSpace.rotation.y += 0.01;
+//        object2.updateMatrix();
+
+        renderer.render( scene, camerap );
+      };
+
+/*      function tp(Matrix4 m){
+        Matrix4 m_t = new Matrix4(m.elements[1,1], m[1,2])
+      }*/
+
+
+
+      // uncomment one (and only one!) appropriate line
+//      renderer.render( scene, camerao );
+//      renderer.render( scene, camerap );
+//		animateo();
+      animatep();
+    </script>
+	<canvas></canvas>
+  </body>
+</html>
