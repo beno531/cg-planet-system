@@ -57,7 +57,7 @@
         camera.lookAt (new THREE.Vector3(0,0,0));
 
         topCamera = new THREE.PerspectiveCamera (75, aspect, 0.1, 1000);
-        topCamera.position.set (0,150,0);
+        topCamera.position.set (100,150,0);
         topCamera.lookAt (new THREE.Vector3(0,0,0));
 
 
@@ -144,9 +144,11 @@
 	        render(); 
 
             // 2 Kamera
-            topCamera.position.y = 90 * Math.cos(t) + 0;
-            topCamera.position.y = 40 * Math.sin(t) + 0;
-            topCamera.lookAt (new THREE.Vector3(0,0,0));
+            //topCamera.position.y = 50 * Math.cos(t);
+            //topCamera.lookAt (new THREE.Vector3(0,0,0));
+
+            var rotation = new THREE.Matrix4().makeRotationX(0.01);
+            topCamera.applyMatrix(rotation);
 
 
 
