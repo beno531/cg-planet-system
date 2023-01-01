@@ -1,9 +1,22 @@
 <!DOCTYPE html>
 <html>
 
+<!--
+/** 
+*
+* Datum: 01.01.2023
+* Autor: Sebastian Orschiedt, Benito Ernst
+* 
+*
+* Bemerkung: Damit die Texturen der Planeten geladen werden, 
+* bitte HTML auf lokalen Web-Server ausführen.
+*
+* Die linke Kamera lässt sich mit Hilfe der Tasten "W" und "S" im Winkel eisntellen.
+*/
+-->
+
 <head>
     <meta charset="utf-8">
-    <title>ben</title>
     <style>
         body {
             margin: 0;
@@ -14,8 +27,9 @@
 <body>
     <script src="js/three.js"></script>
     <script>
+
         const scene = new THREE.Scene();
-        const starsTexture = new THREE.TextureLoader().load('stars.jpg');
+        const starsTexture = new THREE.TextureLoader().load('img/stars.jpg');
         scene.background = starsTexture;
         
         const renderer = new THREE.WebGLRenderer();
@@ -25,28 +39,9 @@
         document.body.appendChild(renderer.domElement);
 
 
-
         const aspect = window.innerWidth / window.innerHeight;
         let insetWidth, insetHeight;
 
-        /*
-        // Kamera Main
-        const cameraMain = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
-        cameraMain.position.z = 60;
-        cameraMain.position.y = 60;
-        cameraMain.lookAt(0, 0, 0);
-        cameraMain.name = "MainCamera";
-
-        // Kamera Top
-        const cameraTop = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        cameraTop.position.z = 60;
-        cameraTop.position.y = 0;
-        cameraTop.lookAt(0, 0, -60);
-        cameraTop.name = "StaticCamera";
-
-        cameraMain.add(cameraTop);
-
-        scene.add(cameraMain);*/
 
         var width = window.innerWidth;
 	    var height = window.innerHeight;
@@ -57,12 +52,12 @@
         camera.lookAt (new THREE.Vector3(0,0,0));
 
         topCamera = new THREE.PerspectiveCamera (75, aspect, 0.1, 1000);
-        topCamera.position.set (100,150,0);
+        topCamera.position.z = 100;
         topCamera.lookAt (new THREE.Vector3(0,0,0));
 
 
         // Sonne
-        const sunTexture = new THREE.TextureLoader().load('sun.jpg');
+        const sunTexture = new THREE.TextureLoader().load('img/sun.jpg');
         const sunMaterial = new THREE.MeshBasicMaterial({ map: sunTexture });
         var sunMesh = new THREE.SphereGeometry(10, 64, 64);
         const sun = new THREE.Mesh(sunMesh, sunMaterial);
@@ -70,7 +65,7 @@
         scene.add(sun);
 
         // Erde
-        const earthTexture = new THREE.TextureLoader().load('earth.jpg');
+        const earthTexture = new THREE.TextureLoader().load('img/earth.jpg');
         const earthMaterial = new THREE.MeshLambertMaterial({ map: earthTexture });
         var earthMesh = new THREE.SphereGeometry(3, 64, 64);
         const earth = new THREE.Mesh(earthMesh, earthMaterial);
@@ -81,7 +76,7 @@
         scene.add(earth);
 
         // Mond
-        const moonTexture = new THREE.TextureLoader().load('moon.jpg');
+        const moonTexture = new THREE.TextureLoader().load('img/moon.jpg');
         const moonMaterial = new THREE.MeshLambertMaterial({ map: moonTexture });
         var moonMesh = new THREE.SphereGeometry(1, 64, 64);
         const moon = new THREE.Mesh(moonMesh, moonMaterial);
@@ -126,36 +121,22 @@
             left = 0.5*SCREEN_W+1; bottom = 1; width = 0.5*SCREEN_W-2; height = SCREEN_H-2;
             renderer.setViewport (left,bottom,width,height);
             renderer.setScissor(left,bottom,width,height);
-            renderer.setScissorTest (true);  // clip out "viewport"
+            renderer.setScissorTest (true);
             camera.aspect = width/height;
             camera.updateProjectionMatrix();
             renderer.render (scene,camera);
             
         }
 
-
-
         var t = 0;
         var x = 0;
-        var d = 0;
         var clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame ( animate );  
 	        render(); 
 
-            // 2 Kamera
-            //topCamera.position.y = 50 * Math.cos(t);
-            //topCamera.lookAt (new THREE.Vector3(0,0,0));
-
-            var rotation = new THREE.Matrix4().makeRotationX(0.01);
-            topCamera.applyMatrix(rotation);
-
-
-
-            //topCamera.lookAt (new THREE.Vector3(0,0,0));
-
             // Sonne
-            //sun.rotation.y += 0.001;
+            sun.rotation.y += 0.002;
 
             // Erde
             t += 0.006;
@@ -170,6 +151,23 @@
             moon.position.z = earth.position.z + 6 * Math.sin(x) + 0;
         };
 
+        function setupKeyControls() {
+            var cube = scene.getObjectByName('cube');
+            document.onkeydown = function (e) {
+                switch (e.keyCode) {
+                    case 87:
+                        var rotationUp = new THREE.Matrix4().makeRotationX(0.05);
+                        topCamera.applyMatrix(rotationUp);
+                        break;
+                    case 83:
+                        var rotationDown = new THREE.Matrix4().makeRotationX(-0.05);
+                        topCamera.applyMatrix(rotationDown);
+                        break;
+                }
+            };
+        }
+
+        setupKeyControls();
         animate();
         
     </script>
